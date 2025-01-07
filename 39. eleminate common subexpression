@@ -1,0 +1,28 @@
+#include <stdio.h>
+
+int main() {
+    int a = 5, b = 10, c = 15;
+    
+    // Before Optimization: Identical subexpression a + b is evaluated twice
+    int result1 = a + b + c;    // Expression 1
+    int result2 = a + b * c;    // Expression 2
+    int result3 = (a + b) * c;  // Expression 3
+    
+    printf("Before Optimization:\n");
+    printf("result1 = %d\n", result1);
+    printf("result2 = %d\n", result2);
+    printf("result3 = %d\n", result3);
+    
+    // After Optimization: Eliminate the common subexpression a + b
+    int ab = a + b;  // Compute the common subexpression once
+    int optimizedResult1 = ab + c;   // Optimized Expression 1
+    int optimizedResult2 = ab * c;   // Optimized Expression 2
+    int optimizedResult3 = ab * c;   // Optimized Expression 3
+    
+    printf("\nAfter Optimization:\n");
+    printf("optimizedResult1 = %d\n", optimizedResult1);
+    printf("optimizedResult2 = %d\n", optimizedResult2);
+    printf("optimizedResult3 = %d\n", optimizedResult3);
+    
+    return 0;
+}
