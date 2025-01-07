@@ -1,0 +1,33 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+void eliminateLeftRecursion(char nonTerminal, char* production) {
+    char alpha[20], beta[20];
+    int i = 0, j = 0, k = 0;
+    if (production[0] == nonTerminal) {
+        for (i = 1; production[i] != '|' && production[i] != '\0'; i++) {
+            alpha[j++] = production[i];
+        }
+        alpha[j] = '\0';
+        if (production[i] == '|') i++; 
+        while (production[i] != '\0') {
+            beta[k++] = production[i++];
+        }
+        beta[k] = '\0';
+        printf("%c -> %s%c'\n", nonTerminal, beta, nonTerminal);
+        printf("%c' -> %s%c' | ε\n", nonTerminal, alpha, nonTerminal);
+    } else {
+        printf("No left recursion detected for %c -> %s\n", nonTerminal, production);
+    }
+}
+int main() {
+    char nonTerminal;
+    char production[50];
+    printf("Enter the non-terminal: ");
+    scanf(" %c", &nonTerminal);
+    printf("Enter the production (e.g., A->Aa|b): ");
+    scanf(" %*c%s", production); 
+    char* actualProduction = strchr(production, '>') + 1;
+    eliminateLeftRecursion(nonTerminal, actualProduction);
+    return 0;
+}
