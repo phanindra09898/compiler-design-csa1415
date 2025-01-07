@@ -1,0 +1,33 @@
+#include <stdio.h>
+#include <ctype.h>
+
+int main() {
+    char ch;
+    int charCount = 0, wordCount = 0, lineCount = 0;
+    int inWord = 0;  // Flag to track if we are inside a word
+
+    printf("Enter text (Ctrl+D to end input):\n");
+
+    // Read each character from stdin
+    while ((ch = getchar()) != EOF) {
+        charCount++;  // Count every character
+
+        if (ch == '\n') {
+            lineCount++;  // Increment line count when newline is encountered
+        }
+
+        if (isspace(ch)) {
+            inWord = 0;  // We are no longer in a word
+        } else if (!inWord) {
+            wordCount++;  // We found the start of a new word
+            inWord = 1;   // Set the flag to indicate we are inside a word
+        }
+    }
+
+    // Output the results
+    printf("\nTotal characters: %d\n", charCount);
+    printf("Total words: %d\n", wordCount);
+    printf("Total lines: %d\n", lineCount);
+
+    return 0;
+}
