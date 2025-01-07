@@ -1,0 +1,44 @@
+32 lab Question compiler design 
+
+
+#include <stdio.h>
+#include <string.h>
+void eliminateLeftFactoring(char nonTerminal, char* production) {
+    char commonPrefix[20], remaining1[20], remaining2[20];
+    int i = 0, j = 0, k = 0, l = 0;
+    char* part1 = strtok(production, "|");
+    char* part2 = strtok(NULL, "|");
+    if (!part2) {
+        printf("No left factoring needed for %c -> %s\n", nonTerminal, part1);
+        return;
+    }
+    while (part1[i] != '\0' && part2[i] != '\0' && part1[i] == part2[i]) {
+        commonPrefix[j++] = part1[i++];
+    }
+    commonPrefix[j] = '\0';
+    while (part1[i] != '\0') {
+        remaining1[k++] = part1[i++];
+    }
+    remaining1[k] = '\0';
+    while (part2[j] != '\0') {
+        remaining2[l++] = part2[j++];
+    }
+    remaining2[l] = '\0';
+    if (strlen(commonPrefix) > 0) {
+        printf("%c -> %s%c'\n", nonTerminal, commonPrefix, nonTerminal);
+        printf("%c' -> %s | %s\n", nonTerminal, remaining1[0] ? remaining1 : "ε", remaining2[0] ? remaining2 : "ε");
+    } else {
+        printf("No left factoring possible for %c -> %s|%s\n", nonTerminal, part1, part2);
+    }
+}
+int main() {
+    char nonTerminal;
+    char production[50];
+    printf("Enter the non-terminal: ");
+    scanf(" %c", &nonTerminal);
+    printf("Enter the production (e.g., A->abc|abd): ");
+    scanf(" %*c%s", production); 
+    char* actualProduction = strchr(production, '>') + 1;
+    eliminateLeftFactoring(nonTerminal, actualProduction);
+    return 0;
+}
