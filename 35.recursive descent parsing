@@ -1,0 +1,104 @@
+#include <stdio.h>
+#include <ctype.h>
+#include <string.h>
+
+char input[100];
+int position = 0;
+
+int E();
+int E_prime();
+int T();
+int T_prime();
+int F();
+int match(char expected);
+
+int match(char expected) {
+    if (input[position] == expected) {
+        position++;
+        return 1; // Matched expected character
+    }
+    return 0; // Did not match expected character
+}
+
+int E() {
+    if (T()) {
+        return E_prime(); // After parsing term, try to parse E'
+    }
+    return 0; // If T fails, E fails
+}
+
+int E_prime() {
+    if (match('+')) {
+        if (T()) {
+            return E_prime(); // Parse additional terms after +
+        }
+        return 0; // If T fails after +, return 0
+    }
+    if (match('-')) {
+        if (T()) {
+            return E_prime(); // Parse additional terms after -
+        }
+        return 0; // If T fails after -, return 0
+    }
+    return 1; // ε production (nothing more after E)
+}
+
+int T() {
+    if (F()) {
+        return T_prime(); // After parsing factor, try to parse T'
+    }
+    return 0; // If F fails, T fails
+}
+
+int T_prime() {
+    if (match('*')) {
+        if (F()) {
+            return T_prime(); // Parse additional factors after *
+        }
+        return 0; // If F fails after *, return 0
+    }
+    if (match('/')) {
+        if (F()) {
+            return T_prime(); // Parse additional factors after /
+        }
+        return 0; // If F fails after /, return 0
+    }
+    return 1; // ε production (nothing more after T)
+}
+
+int F() {
+    if (match('(')) { // Check for opening parenthesis
+        if (E()) {
+            if (match(')')) { // Expect a closing parenthesis
+                return 1;
+            }
+        }
+        return 0; // If no matching parenthesis or E fails
+    }
+    if (isdigit(input[position])) { // If the character is a digit
+        while (isdigit(input[position])) { // Parse entire number
+            position++;
+        }
+        return 1;
+    }
+    if (isalpha(input[position])) { // If the character is a variable (alphabet)
+        position++;
+        return 1;
+    }
+    return 0; // If it's neither a digit nor a variable, return 0
+}
+
+int main() {
+    printf("Enter an expression: ");
+    scanf("%s", input);
+
+    position = 0; // Reset the position to the start of the input
+
+    if (E() && input[position] == '\0') {
+        printf("The input string is valid according to the grammar.\n");
+    } else {
+        printf("The input string is invalid.\n");
+    }
+
+    return 0;
+}
