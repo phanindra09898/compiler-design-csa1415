@@ -1,0 +1,71 @@
+#include <stdio.h>
+#include <ctype.h>
+#include <string.h>
+
+#define MAX 100
+
+// Structure to represent the three-address code
+typedef struct {
+    char result[MAX];
+    char operand1[MAX];
+    char operand2[MAX];
+    char operator;
+} TAC;
+
+// Function to generate three-address code for an expression
+void generateTAC(char* expression) {
+    char operators[] = "+-*/";
+    TAC tac[MAX];
+    int tacIndex = 0;
+    char stack[MAX];
+    int top = -1;
+
+    // Process each character in the expression
+    for (int i = 0; expression[i] != '\0'; i++) {
+        if (isspace(expression[i])) {
+            continue;  // Skip spaces
+        }
+
+        if (isalnum(expression[i])) {  // Operand (variable or constant)
+            stack[++top] = expression[i];
+        }
+        else if (strchr(operators, expression[i]) != NULL) {  // Operator
+            if (top >= 1) {
+                // Pop two operands for the operation
+                char operand2 = stack[top--];
+                char operand1 = stack[top--];
+                char operator = expression[i];
+
+                // Create a new temporary variable for the result
+                char tempVar[3] = "t";  // Temp variable starts with 't'
+                tempVar[1] = '0' + tacIndex;  // Assign an index to the temp variable
+                tac[tacIndex].operator = operator;
+                tac[tacIndex].operand1[0] = operand1;
+                tac[tacIndex].operand2[0] = operand2;
+                strcpy(tac[tacIndex].result, tempVar);  // Store result in temp variable
+                tacIndex++;
+
+                // Push the result (temporary variable) back onto the stack
+                stack[++top] = tempVar[0];  
+            }
+        }
+    }
+
+    // Print the generated three-address code
+    printf("\nGenerated Three-Address Code:\n");
+    for (int i = 0; i < tacIndex; i++) {
+        printf("%s = %c %c %c\n", tac[i].result, tac[i].operand1[0], tac[i].operator, tac[i].operand2[0]);
+    }
+}
+
+int main() {
+    char expression[MAX];
+
+    printf("Enter a mathematical expression (e.g., a + b * c): ");
+    fgets(expression, MAX, stdin);
+    expression[strcspn(expression, "\n")] = '\0';  // Remove trailing newline character
+
+    generateTAC(expression);
+
+    return 0;
+}
