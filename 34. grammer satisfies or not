@@ -1,0 +1,28 @@
+#include <stdio.h>
+#include <string.h>
+int position = 0;
+int parseS(char* input) {
+    if (input[position] == 'a') {
+        position++; 
+        if (!parseS(input)) 
+            return 0;
+        if (input[position] == 'b') {
+            position++; 
+            return 1; 
+        }
+        return 0; 
+    }
+    return 1;
+}
+int main() {
+    char input[100];
+    printf("Enter the input string: ");
+    scanf("%s", input);
+    position = 0;
+    if (parseS(input) && input[position] == '\0') {
+        printf("The string '%s' satisfies the grammar.\n", input);
+    } else {
+        printf("The string '%s' does not satisfy the grammar.\n", input);
+    }
+    return 0;
+}
