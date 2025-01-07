@@ -1,0 +1,45 @@
+%{
+#include <stdio.h>
+#include <string.h>
+
+%}
+
+%%
+
+[ \t\n]+        { /* Ignore spaces, tabs, and newlines */ }
+
+"+"             { printf("Operator: +\n"); }  // Addition operator
+
+"-"             { printf("Operator: -\n"); }  // Subtraction operator
+
+"*"             { printf("Operator: *\n"); }  // Multiplication operator
+
+"/"             { printf("Operator: /\n"); }  // Division operator
+
+.               { printf("Unknown character: %s\n", yytext); }  // Any other character
+
+%%
+
+int main(int argc, char **argv) {
+    if (argc != 2) {
+        printf("Usage: %s <filename>\n", argv[0]);
+        return 1;
+    }
+
+    // Open the input file for reading
+    FILE *file = fopen(argv[1], "r");
+    if (!file) {
+        printf("Error: Could not open file %s\n", argv[1]);
+        return 1;
+    }
+
+    // Redirect input to the file
+    yyin = file;
+
+    // Start lexical analysis
+    yylex();
+
+    // Close the file after processing
+    fclose(file);
+    return 0;
+}

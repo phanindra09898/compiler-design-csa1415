@@ -1,0 +1,44 @@
+%{
+#include <stdio.h>
+int comment_count = 0;
+FILE *output_file;
+%}
+
+%%
+
+//.*            { comment_count++; }
+
+/\*([^*]|\*+[^*/])*\*+/   { comment_count++; }
+
+.*\n           { fprintf(output_file, "%s", yytext); }
+
+%%
+
+int main(int argc, char **argv) {
+    if (argc < 3) {
+        printf("Usage: %s <input_file> <output_file>\n", argv[0]);
+        return 1;
+    }
+
+    FILE *file = fopen(argv[1], "r");
+    if (!file) {
+        perror("Error opening input file");
+        return 1;
+    }
+
+    output_file = fopen(argv[2], "w");
+    if (!output_file) {
+        perror("Error opening output file");
+        fclose(file);
+        return 1;
+    }
+
+    yyin = file;
+    yylex();
+
+    fclose(file);
+    fclose(output_file);
+
+    printf("Number of comment lines: %d\n", comment_count);
+    return 0;
+}

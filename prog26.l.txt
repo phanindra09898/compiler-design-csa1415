@@ -1,0 +1,54 @@
+%{
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+#define MAX_IDENTIFIER_LENGTH 32 // Limit identifier length
+
+// Define regular expressions for tokens
+%}
+
+%%
+
+[ \t\n]+        { /* Ignore spaces, tabs, and newlines */ }
+
+"/*"[^*]*"*/"   { /* Ignore comments */ }
+
+[0-9]+          { printf("Constant: %s\n", yytext); }  // Constants (integers)
+
+[A-Za-z_][A-Za-z0-9_]*  {
+                        if (strlen(yytext) <= MAX_IDENTIFIER_LENGTH)
+                            printf("Identifier: %s\n", yytext);
+                        else
+                            printf("Error: Identifier too long: %s\n", yytext);
+                      }  // Identifiers (alphanumeric, starts with letter or _)
+
+[+\-*/%=<>!&|^]    { printf("Operator: %s\n", yytext); }  // Operators (+, -, *, /, %, =, <, >, etc.)
+
+.               { printf("Unknown character: %s\n", yytext); }  // Any other character
+
+%%
+
+int main(int argc, char **argv) {
+    if (argc != 2) {
+        printf("Usage: %s <filename>\n", argv[0]);
+        return 1;
+    }
+
+    // Open the input file for reading
+    FILE *file = fopen(argv[1], "r");
+    if (!file) {
+        printf("Error: Could not open file %s\n", argv[1]);
+        return 1;
+    }
+
+    // Redirect input to the file
+    yyin = file;
+
+    // Start lexical analysis
+    yylex();
+
+    // Close the file after processing
+    fclose(file);
+    return 0;
+}

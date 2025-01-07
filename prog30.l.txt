@@ -1,0 +1,42 @@
+%{
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+%}
+
+%%
+
+[ \t\n]+        { /* Ignore spaces, tabs, and newlines */ }
+
+[A-Za-z_][A-Za-z0-9_]* {
+                        printf("Valid identifier: %s\n", yytext);
+                      }  // Valid identifier
+
+.               { printf("Invalid identifier: %s\n", yytext); }  // Any other character
+
+%%
+
+int main(int argc, char **argv) {
+    if (argc != 2) {
+        printf("Usage: %s <filename>\n", argv[0]);
+        return 1;
+    }
+
+    // Open the input file for reading
+    FILE *file = fopen(argv[1], "r");
+    if (!file) {
+        printf("Error: Could not open file %s\n", argv[1]);
+        return 1;
+    }
+
+    // Redirect input to the file
+    yyin = file;
+
+    // Start lexical analysis
+    yylex();
+
+    // Close the file after processing
+    fclose(file);
+    return 0;
+}

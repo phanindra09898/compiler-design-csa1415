@@ -1,0 +1,43 @@
+%{
+#include <stdio.h>
+
+int whitespace_count = 0;  // Counter for whitespace characters
+int newline_count = 0;     // Counter for newline characters
+%}
+
+%%
+
+[ \t]+          { whitespace_count++; }  // Increment count for spaces and tabs
+\n              { newline_count++; }     // Increment count for newlines
+
+.               { /* Ignore all other characters */ }
+
+%%
+
+int main(int argc, char **argv) {
+    if (argc != 2) {
+        printf("Usage: %s <filename>\n", argv[0]);
+        return 1;
+    }
+
+    // Open the input file for reading
+    FILE *file = fopen(argv[1], "r");
+    if (!file) {
+        printf("Error: Could not open file %s\n", argv[1]);
+        return 1;
+    }
+
+    // Redirect input to the file
+    yyin = file;
+
+    // Start lexical analysis
+    yylex();
+
+    // Output the counts for whitespace and newline characters
+    printf("Number of whitespace characters (spaces/tabs): %d\n", whitespace_count);
+    printf("Number of newline characters: %d\n", newline_count);
+
+    // Close the file after processing
+    fclose(file);
+    return 0;
+}

@@ -1,0 +1,61 @@
+int char_count = 0;
+int line_count = 0;
+int word_count = 0;
+%}
+
+%%
+
+// Match and ignore single-line comments
+// Example: // This is a comment
+"//".*                    { /* Ignore single-line comments */ }
+
+// Match and ignore multi-line comments
+// Example: /* This is a comment */
+/\*([^*]|\*+[^*/])*\*+/   { /* Ignore multi-line comments */ }
+
+// Match and count newlines
+\n                          { line_count++; char_count++; }
+
+// Match and count words (identifiers, keywords, etc.)
+[a-zA-Z_][a-zA-Z0-9_]*      { word_count++; char_count += yyleng; }
+
+// Match and count numbers
+[0-9]+                      { word_count++; char_count += yyleng; }
+
+// Match and count strings (e.g., "text")
+"([^"\\]|\\.)*"            { word_count++; char_count += yyleng; }
+
+// Match and count operators and punctuation
+[\+\-\*/=;:,\(\)\[\]\{\}]  { char_count += yyleng; }
+
+// Match and ignore whitespace (spaces, tabs)
+[ \t]+                      { char_count += yyleng; }
+
+// Catch-all for any remaining characters
+.                           { char_count++; }
+
+%%
+
+int main(int argc, char **argv) {
+    if (argc < 2) {
+        fprintf(stderr, "Usage: %s <input_file>\n", argv[0]);
+        return 1;
+    }
+
+    FILE *file = fopen(argv[1], "r");
+    if (!file) {
+        perror("Failed to open file");
+        return 1;
+    }
+
+    yyin = file;
+    yylex();
+
+    fclose(file);
+
+    printf("Number of characters: %d\n", char_count);
+    printf("Number of lines: %d\n", line_count);
+    printf("Number of words: %d\n", word_count);
+
+    return 0;
+}

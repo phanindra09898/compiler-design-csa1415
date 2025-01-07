@@ -1,0 +1,36 @@
+%{
+#include <stdio.h>
+#include <string.h>
+
+int word_count = 0;
+char target_word[100];
+%}
+
+%%
+
+[a-zA-Z]+ {
+    if (strcmp(yytext, target_word) == 0) {
+        word_count++;
+    }
+}
+
+%%
+
+int main(int argc, char **argv) {
+    if (argc != 2) {
+        printf("Usage: %s <word>\n", argv[0]);
+        return 1;
+    }
+
+    // Copy the target word from command line argument
+    strcpy(target_word, argv[1]);
+
+    printf("Enter a sentence:\n");
+
+    // Start lexical analysis
+    yylex();
+
+    printf("The word '%s' appeared %d times in the sentence.\n", target_word, word_count);
+
+    return 0;
+}
